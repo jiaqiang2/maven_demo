@@ -3,9 +3,9 @@
         PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
 <generatorConfiguration>
-    <!--导入属性配置-->
-    <properties resource="generator.properties"></properties>
-    <!--数据库驱动-->
+    <!--导入属性配置文件路径-->
+    <properties resource="generatorConfig.properties"></properties>
+    <!--数据库驱动包路径 -->
     <classPathEntry location="${jdbc.driverLocation}"/>
     <context id="MybatisGenerate" targetRuntime="MyBatis3" defaultModelType="flat">
         <!-- 指定生成的java文件的编码,没有直接生成到项目时中文可能会乱码 -->
@@ -16,42 +16,27 @@
         <plugin type="org.mybatis.generator.plugins.ToStringPlugin"/>
         <!-- 生成的实体类重写hashCode和equals方法 -->
         <!--<plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin"/>-->
-        <!-- 生成数据库字段注释及自定义注释 【扩展插件】 -->
-        <commentGenerator type="com.hp.accept.plugin.RemarksCommentGenerator">
-            <!-- 格式化java代码 -->
-            <property name="javaFormatter" value="org.mybatis.generator.api.dom.DefaultJavaFormatter"/>
-            <!-- 格式化XML代码 -->
-            <property name="xmlFormatter" value="org.mybatis.generator.api.dom.DefaultXmlFormatter"/>
-            <!-- 开启抑制类型的警告信息 -->
-            <property name="suppressTypeWarnings" value="true"/>
-            <!-- 生成的Java文件的默认编码 -->
-            <property name="javaFileEncoding" value="UTF-8" />
-            <!-- 是否去除自动生成的注释 true：是 ： false:否 -->
-            <property name="suppressAllComments" value="true" />
-            <!-- 是否给实体类生成的注释 true：是 ： 默认为false:否 -->
-            <property name="addRemarkComments" value="true"/>
-
-            <property name="suppressDate" value="true" />
-        </commentGenerator>
 
         <!--数据库链接地址账号密码-->
         <jdbcConnection
-                driverClass="${jdbc.driverClass}"
-                connectionURL="${jdbc.connectionURL}"
-                userId="${jdbc.userId}"
+                driverClass="${jdbc.driver}"
+                connectionURL="${jdbc.url}"
+                userId="${jdbc.username}"
                 password="${jdbc.password}">
         </jdbcConnection>
+
         <!-- 非必需，类型处理器，在数据库类型和java类型之间的转换控制-->
         <javaTypeResolver>
             <property name="forceBigDecimals" value="false"/>
         </javaTypeResolver>
+
         <!-- Model模型生成器,用来生成含有主键key的类，记录类 以及查询Example类
            targetPackage     指定生成的model生成所在的包名
            targetProject     指定在该项目下所在的路径
        -->
         <javaModelGenerator
-                targetPackage="com.hp.accept.entity.dto"
-                targetProject="src/main/java">
+                targetPackage="${model.package}"
+                targetProject="${target.project}">
             <!-- 是否允许子包，即targetPackage.schemaName.tableName -->
             <property name="enableSubPackages" value="true"/>
             <!-- 是否对model添加 构造函数 -->
@@ -60,13 +45,20 @@
             <property name="trimStrings" value="true"/>
             <!-- 建立的Model对象是否 不可改变  即生成的Model对象不会有 setter方法，只有构造方法 -->
             <property name="immutable" value="false"/>
+
+            <!--如果true，MBG会根据catalog和schema来生成子包。如果false就会直接用targetPackage属性。默认为false。 -->
+            <property name="enableSubPackages" value="true"/>
+            <!-- 是否对数据库查询结果进行trim操作,如果设置为true就会生成类似这样public void setUsername(String username) {this.username = username == null ? null : username.trim();}的setter方法。默认值为false。-->
+            <property name="trimStrings" value="true"/>
+
         </javaModelGenerator>
+
+
         <!--Mapper映射文件生成所在的目录 为每一个数据库的表生成对应的SqlMap文件 -->
         <sqlMapGenerator
-                targetPackage="mybatis/entity"
+                targetPackage="mybatis/mapper"
                 targetProject="src/main/resources">
             <property name="enableSubPackages" value="true"/>
-            <property name="rootClass" value="com.hp.accept.entity.base.BasePrimary"/>
         </sqlMapGenerator>
 
         <!-- 客户端代码，生成易于使用的针对Model对象和XML配置文件 的代码
@@ -76,49 +68,13 @@
        -->
         <javaClientGenerator
                 type="XMLMAPPER"
-                targetPackage="com.hp.accept.dao.mapper"
-                targetProject="src/main/java">
+                targetPackage="${dao.package}"
+                targetProject="${target.project}">
             <property name="enableSubPackages" value="true"/>
-            <property name="rootInterface" value="com.hp.accept.dao.base.BaseMapper"/>
         </javaClientGenerator>
 
         <!--生成对应表及类名-->
-      <!--  <table tableName="iot%" enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false">
-            <property name="useActualColumnNames" value="false"/>
-            <generatedKey column="id" sqlStatement="Mysql"/>
-            <domainObjectRenamingRule searchString="^Iot" replaceString="" />
-        </table>-->
-        <!--<table tableName="iot_building_check" domainObjectName="BuildingCheck"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>
-        <table tableName="iot_building_device_check" domainObjectName="BuildingDeviceCheck"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="iot_check_plan" domainObjectName="CheckPlan"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="iot_join_building" domainObjectName="JoinBuilding"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="iot_building_fault" domainObjectName="BuildingFault"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>-->
-        <!--<table tableName="iot_building_fire" domainObjectName="BuildingFire"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>
-        <table tableName="iot_building_water" domainObjectName="BuildingWater"
-               enableCountByExample="false" enableUpdateByExample="false"
-               enableDeleteByExample="false" enableSelectByExample="false"
-               selectByExampleQueryId="false"></table>-->
-        <table tableName="iot_access_unit" domainObjectName="AccessUnit"
+        <table tableName="g_iot_data_point_relation" domainObjectName="Relation"
                enableCountByExample="false" enableUpdateByExample="false"
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"></table>
